@@ -1,0 +1,30 @@
+<env type="physical" name="Virtual Environment 1">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>10.0,10.0</vertex>
+      <vertex>0.0,10.0</vertex>
+      <vertex>0.0,0.0</vertex>
+      <vertex>10.0,0.0</vertex>
+    </vertices>
+    <vertex type="center">0.0,0.0</vertex>
+  </border>
+
+  <!-- Obstacles -->
+  <obstacle type="static" name="o1">
+    <vertices>
+      <vertex>2,2</vertex>
+      <vertex>4,2</vertex>
+      <vertex>4,6</vertex>
+      <vertex>2,6</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o2">
+    <vertices>
+      <vertex>7,5</vertex>
+      <vertex>9,5</vertex>
+      <vertex>8,7</vertex>
+    </vertices>
+  </obstacle>
+</env>

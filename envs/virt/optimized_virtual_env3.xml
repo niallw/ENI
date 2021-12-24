@@ -1,0 +1,49 @@
+<env type="physical" name="Virtual Environment 3">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>10.0,10.0</vertex>
+      <vertex>0.0,10.0</vertex>
+      <vertex>0.0,0.0</vertex>
+      <vertex>10.0,0.0</vertex>
+    </vertices>
+    <vertex type="center">0.0,0.0</vertex>
+  </border>
+
+  <!-- Obstacles -->
+  <obstacle type="static" name="o1">
+    <vertices>
+      <vertex>0,6</vertex>
+      <vertex>2,6</vertex>
+      <vertex>2,10</vertex>
+      <vertex>0,10</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o2">
+    <vertices>
+      <vertex>4,8</vertex>
+      <vertex>10,8</vertex>
+      <vertex>10,10</vertex>
+      <vertex>4,10</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o3">
+    <vertices>
+      <vertex>2,3</vertex>
+      <vertex>2,2</vertex>
+      <vertex>3,1.5</vertex>
+      <vertex>5,2.5</vertex>
+      <vertex>4.5,4</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o4">
+    <vertices>
+      <vertex>7.5,0.5</vertex>
+      <vertex>9.5,0.5</vertex>
+      <vertex>7.5,2.5</vertex>
+    </vertices>
+  </obstacle>
+</env>

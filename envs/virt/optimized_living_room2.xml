@@ -1,0 +1,52 @@
+<env type="physical" name="Virtual Living Room 2">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>0,0</vertex>
+      <vertex>8,0</vertex>
+      <vertex>8,8</vertex>
+      <vertex>0,8</vertex>
+    </vertices>
+    <vertex type="center">0,0</vertex>
+  </border>
+
+  <!-- Obstacles -->
+  <obstacle type="static" name="o1">
+    <vertices>
+      <vertex>1,4.5</vertex>
+      <vertex>3.5,4.5</vertex>
+      <vertex>3.5,7</vertex>
+      <vertex>1,7</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o2">
+    <vertices>
+      <vertex>0.8,0.5</vertex>
+      <vertex>1.6,0.5</vertex>
+      <vertex>1.85,1.1</vertex>
+      <vertex>1.2,1.7</vertex>
+      <vertex>0.55,1.1</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o3">
+    <vertices>
+      <vertex>8,8</vertex>
+      <vertex>5,8</vertex>
+      <vertex>5,5</vertex>
+      <vertex>8,5</vertex>
+    </vertices>
+  </obstacle>
+  
+  <obstacle type="static" name="o4">
+    <vertices>
+      <vertex>4,1.5</vertex>
+      <vertex>7,1.5</vertex>
+      <vertex>7,2</vertex>
+      <vertex>6,2.5</vertex>
+      <vertex>5,2.5</vertex>
+      <vertex>4,2</vertex>
+    </vertices>
+  </obstacle>  
+</env>

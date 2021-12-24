@@ -1,0 +1,12 @@
+<env type="physical" name="Empty Square (Phys)">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>5,-5</vertex>
+      <vertex>5,5</vertex>
+      <vertex>-5,5</vertex>
+      <vertex>-5,-5</vertex>
+    </vertices>
+    <vertex type="center">0.0,0.0</vertex>
+  </border>
+</env>

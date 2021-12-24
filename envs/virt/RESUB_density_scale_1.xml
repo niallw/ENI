@@ -1,0 +1,56 @@
+<env type="virtual" name="900 sq m (4 objects) (Virtual)">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>-17.74823932,7.606388280000001</vertex>
+      <vertex>0.0,17.74823932</vertex>
+      <vertex>17.74823932,7.606388280000001</vertex>
+      <vertex>17.74823932,-7.606388280000001</vertex>
+      <vertex>0.0,-17.74823932</vertex>
+      <vertex>-17.74823932,-7.606388280000001</vertex>
+    </vertices>
+    <vertex type="center">0.0,0.0</vertex>
+  </border>
+
+  <!-- Obstacles -->
+  <obstacle type="static" name="o1">
+    <vertices>
+      <vertex>2.3012346461069724,7.3031367664537274</vertex>
+      <vertex>3.6862059054968968,7.115772034855842</vertex>
+      <vertex>6.057789176629399,7.3423460281176816</vertex>
+      <vertex>3.401540049990147,9.347248948812208</vertex>
+      <vertex>3.3819192639245235,7.908021784406373</vertex>
+    </vertices>
+  </obstacle>
+
+  <obstacle type="static" name="o2">
+    <vertices>
+      <vertex>11.219176106445024,-10.440199798313145</vertex>
+      <vertex>11.844756781481324,-7.669948347315313</vertex>
+      <vertex>12.917205528557295,-6.484441831062494</vertex>
+      <vertex>11.99677943679453,-5.244886405914007</vertex>
+      <vertex>8.150520373083285,-7.626793765246676</vertex>
+    </vertices>
+  </obstacle>
+
+  <obstacle type="static" name="o3">
+    <vertices>
+      <vertex>-3.138697598905839,-4.843255773039565</vertex>
+      <vertex>-3.0850396452189504,-6.323221782298996</vertex>
+      <vertex>-0.19932391613488132,-5.119734001475333</vertex>
+      <vertex>1.7613925540394018,-5.248907366705341</vertex>
+      <vertex>2.061603135574541,-4.322980760157242</vertex>
+      <vertex>2.2187747425765765,0.6441344852568607</vertex>
+      <vertex>0.23775585490187523,0.142795071500609</vertex>
+      <vertex>-3.2188268924073595,0.17104807292333435</vertex>
+    </vertices>
+  </obstacle>
+
+  <obstacle type="static" name="o4">
+    <vertices>
+      <vertex>-5.1230998107760515,-8.623971671700748</vertex>
+      <vertex>-5.889816871306801,-6.208945466339154</vertex>
+      <vertex>-7.439840838856918,-6.712213039195592</vertex>
+    </vertices>
+  </obstacle>
+</env>

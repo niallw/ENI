@@ -1,0 +1,12 @@
+<env type="physical" name="user_study_1_EnvA (Phys)">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>4.37,6.125</vertex>
+      <vertex>0.0,6.125</vertex>
+      <vertex>0.0,0.0</vertex>
+      <vertex>4.37,0.0</vertex>
+    </vertices>
+    <vertex type="center">0.0,0.0</vertex>
+  </border>
+</env>

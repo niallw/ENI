@@ -1,0 +1,49 @@
+<env type="physical" name="Office (Physical)">
+  <!-- Border -->
+  <border name="border">
+    <vertices>
+      <vertex>12.0,12.0</vertex>
+      <vertex>0.0,12.0</vertex>
+      <vertex>0.0,0.0</vertex>
+      <vertex>12.0,0.0</vertex>
+    </vertices>
+    <vertex type="center">0.0,0.0</vertex>
+  </border>
+
+  <!-- Obstacles -->
+  <obstacle type="static" name="o1">
+    <vertices>
+      <vertex>2.0,2.0</vertex>
+      <vertex>5.0,2.0</vertex>
+      <vertex>5.0,5.0</vertex>
+      <vertex>2.0,5.0</vertex>
+    </vertices>
+  </obstacle>
+
+  <obstacle type="static" name="o2">
+    <vertices>
+      <vertex>7.0,2.0</vertex>
+      <vertex>10.0,2.0</vertex>
+      <vertex>10.0,5.0</vertex>
+      <vertex>7.0,5.0</vertex>
+    </vertices>
+  </obstacle>
+
+  <obstacle type="static" name="o3">
+    <vertices>
+      <vertex>7.0,7.0</vertex>
+      <vertex>10.0,7.0</vertex>
+      <vertex>10.0,10.0</vertex>
+      <vertex>7.0,10.0</vertex>
+    </vertices>
+  </obstacle>
+
+  <obstacle type="static" name="o4">
+    <vertices>
+      <vertex>2.0,7.0</vertex>
+      <vertex>5.0,7.0</vertex>
+      <vertex>5.0,10.0</vertex>
+      <vertex>2.0,10.0</vertex>
+    </vertices>
+  </obstacle>
+</env>
