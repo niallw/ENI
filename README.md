@@ -11,12 +11,9 @@ Official implementation of the VR2022 paper "ENI: Quantifying Environment Compat
 
 4) Create and activate a virtual environment using the following commands:
 ```bash
-conda create --name eni
+conda env create -f environment.yml
+conda activate eni
 ```
-TODO: steps to create a virtual env
-
-5) Install the required modules using the following command:
-TODO: command to install required libraries. probbaly from a requirements.txt
 
 6) Run `python3 environment.py`.
 
