@@ -7,7 +7,7 @@ Official implementation of the VR2022 paper "ENI: Quantifying Environment Compat
 
 2) Clone this repository.
 
-3) Using the `conda` terminal, nagivate to the top level of this repository wherever you saved it on your computer.
+3) Using the `conda` terminal, navigate to the top level of this repository wherever you saved it on your computer.
 
 4) Create and activate a virtual environment using the following commands:
 ```bash
