@@ -271,10 +271,6 @@ def ray_point_intersection(ray_origin, ray_dir, p):
         angle += math.pi + math.pi
 
     return EPSILON_COMPARE(ray_dir, angle)
-    # if abs(ray_dir - angle) <= 0.01:
-    #     return True
-    # else:
-    #     return False
 
 def project_point(v, p):
     """Project a point onto a vector. It is required that the vector and point are
@@ -347,6 +343,22 @@ def sort_by_angle(pts):
     return sorted_pts
 
 def get_first_polygon_intersection(polygon_pts, ray_origin, ray_dir):
+    """Get the first intersection with a polygon boundary starting from a 
+    given position and in a specified direction.
+
+    Args:
+        polygon_pts: The vertices denoting the boundary of the polygon.
+        ray_origin: The position from which we want to check for an intersection.
+        ray_dir: The direction in which to seek the first intersection with the polygon,
+                 emanating from ray_origin.
+
+    Returns:
+        A point on the polygon boundary denoting the first intersection in the direction
+        ray_dir emanating ray_origin, or None if there is no intersection.
+
+    Return type:
+        2D numpy array
+    """
     its_dist = float('inf')
     its_pt = None
 
@@ -387,9 +399,35 @@ def get_first_polygon_intersection(polygon_pts, ray_origin, ray_dir):
     return its_pt
 
 def line_segments_intersect(s1_1, s1_2, s2_1, s2_2):
+    """Determine if two line segments intersect.
+
+    Args:
+        s1_1: The first endpoint of the first line segment.
+        s1_2: The second endpoint of the first line segment.
+        s2_1: The first endpoint of the second line segment.
+        s2_1: The second endpoint of the second line segment.
+
+    Returns:
+        True if the line segments intersect, False otherwise.
+
+    Return type:
+        boolean
+    """
     return (orient(s1_1, s1_2, s2_1) != orient(s1_1, s1_2, s2_2)) and (orient(s2_1, s2_2, s1_1) != orient(s2_1, s2_2, s1_2))
 
 def polyline_edge_intersection(polyline, edge):
+    """Compute the intersection points between an edge and a polyline.
+
+    Args:
+        polyline: A chain of connected line segments.
+        edge: The edge whose intersection(s) with the polyline we wish to compute.
+
+    Returns:
+        A list of intersection points between the polyline and edge.
+
+    Return type:
+        A list of numpy arrays.
+    """
     its_pts = []
     e_p1 = edge[0]
     e_p2 = edge[1]
