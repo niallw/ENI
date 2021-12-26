@@ -13,12 +13,11 @@ class MinimizeStopper(object):
         self.fun = f                     # set the objective function
         self.best_x = None
         self.best_func = np.inf
-        self.threshold = tau                   # set the user-desired threshold
+        self.threshold = tau             # set the user-desired threshold
         self.poly1 = poly1
         self.poly2 = poly2
 
     def __call__(self, xk, convergence=None, *args, **kwds):
-        # print('convergence: {}'.format(convergence))
         rotated_poly2 = self.poly2.rotate(xk)
         loss = self.poly1.compare_symmetric_diff(rotated_poly2)
         return geometry.EPSILON_CHECK(loss, epsilon=self.threshold)
@@ -81,8 +80,7 @@ class StarPolygon:
             pts: The vertices of the polygon that were initially passed in.
 
         Returns:
-            The list of vertices, with the intersection point for the ray theta=0 added to 
-            the list.
+            The list of vertices, with the intersection point for the ray theta=0 added to the list.
 
         Return type:
             List of numpy points.

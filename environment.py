@@ -15,8 +15,7 @@ import matplotlib.tri as tri
 import matplotlib.cm as cm 
 import random
 import pathlib
-# from multiprocessing import Pool
-from tqdm import tqdm # Progress bar
+from tqdm import tqdm
 from datetime import datetime
 from skgeom import *
 import statistics
