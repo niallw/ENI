@@ -30,7 +30,7 @@ class StarPolygon:
         avg_radius: The average value of the distance from the kernel to the polygon boundary.
     """
 
-    def __init__(self, pts, center, compute_area=False):
+    def __init__(self, pts, center=None, compute_area=False):
         """Constructor for the Polygon class.
 
         Args:
@@ -38,9 +38,13 @@ class StarPolygon:
             center: The kernel of the polygon. This is only used if the polygon we are creating
                     is a visibility polygon. If we just want a regular polygon (not a visibility
                     polygon), simply do not pass in any second argument into your constructor call.
+
+                    Note that this is a little bit of a hack/abuse of "notation" since a star polygon
+                    requires a kernel, but we are allowing the creation of a StarPolygon object without
+                    a kernel. This was done to make the code simpler, so that I didn't have to make two 
+                    classes (generic Polygon class and StarPolygon class). I just "recycle" this class
+                    when creating polygon borders for obstacles and environment borders in environment.py
         """
-        assert not center is None, 'Star polygon was not given a valid kernel!'
-        
         self.kernel = center
         self.pts = self.add_theta_0_point(pts)
         self.verts = []
