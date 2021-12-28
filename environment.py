@@ -29,7 +29,6 @@ class Environment():
     XML file. This class is useful for sampling points and paths in the environment.
 
     Attributes:
-        SAMPLES_PER_SQ_METER: The number of points sampled per square meter in the environment.
         name: The name of the environment.
         border: The polygon that defines the boundary of the environment.
         center: The center of the environment. This is not always the centroid.
@@ -64,11 +63,6 @@ class Environment():
     """
 
     def __init__(self, env_file, triangle_area=None):
-        # self.SAMPLES_PER_SQ_METER = 40
-        self.SAMPLES_PER_SQ_METER = .05
-        # import random
-        # random.seed(random.randint(0, 91238748))
-
         self.file = env_file
         self.name = None
         self.border = None # Polygon object
@@ -811,7 +805,8 @@ class Environment():
         # fig.savefig(save_path, dpi=10000)
 
 def compare_envs(env1, env2, with_rotations=True, title_data=''):
-    """For each evenly spaced position (i.e. triangulation vertex) in env1, find the best matching position in env2 (from random samples of the environment).
+    """For each evenly spaced position (i.e. triangulation vertex) in env1, find the 
+    best matching position in env2 (from random samples of the environment).
     In practice, env1 is the virtual environment and env2 is the physical environment.
     """
     import time
@@ -824,8 +819,6 @@ def compare_envs(env1, env2, with_rotations=True, title_data=''):
 
     env1_positions_x = [v[0] for v in env1.triangulated_env['vertices']]
     env1_positions_y = [v[1] for v in env1.triangulated_env['vertices']]
-    env1_polys = env1.random_sampled_visibility_polygons
-    env2_polys = env2.random_sampled_visibility_polygons
     env2_polys = env2.triangulation_visibility_polygons
 
     env2_polys_rotated = []
@@ -855,37 +848,6 @@ def compare_envs(env1, env2, with_rotations=True, title_data=''):
                 temp_matches = [(env1_vis_poly.minus(env2_vis_poly), env1_vis_poly.kernel, env2_vis_poly.kernel) for env2_vis_poly in env2_polys]
                 temp_matches.sort(key=lambda x: x[0])
                 matches.append(temp_matches[0])
-
-    # # The commented tqdm loop below are is bug. In this loop, I am rotating the virtual visibility polygon and computing virt_vis_poly - phys_vis_poly. I should be rotating the physical visibility polygon because that's the one we actually have control over via RDW.
-    # for i in tqdm(range(len(env1_positions_x))):
-    #     p = [env1_positions_x[i], env1_positions_y[i]]
-    #     if not env1.point_is_legal(p):
-    #         pass
-    #         # matches.append((0, p, p))
-    #     else:
-    #         env1_vis_poly = env1.get_triangulation_vis_poly(np.array(p))
-    #         if with_rotations:
-    #             num_rotations = 10
-    #             rotation_amount = geometry.TWO_PI / num_rotations
-    #             best_match_diff = float('inf')
-    #             best_match = None
-    #             for i in range(num_rotations):
-    #                 num_rotations = 10
-    #                 rotation_amount = geometry.TWO_PI / num_rotations
-    #                 best_match_diff = float('inf')
-    #                 best_match = None
-    #                 for i in range(num_rotations):
-    #                     rotated_env1_vis_poly = env1_vis_poly.rotate(i * rotation_amount)
-    #                     cur_match_values = [(rotated_env1_vis_poly.minus(env2_vis_poly), rotated_env1_vis_poly.kernel, env2_vis_poly.kernel) for env2_vis_poly in env2_polys]
-    #                     cur_match_values.sort(key=lambda x: x[0])
-    #                     if cur_match_values[0][0] < best_match_diff:
-    #                         best_match_diff = cur_match_values[0][0]
-    #                         best_match = cur_match_values[0]
-    #             matches.append(best_match)
-    #         else:
-    #             cur_match_values = [(env1_vis_poly.minus(env2_vis_poly), env1_vis_poly.kernel, env2_vis_poly.kernel) for env2_vis_poly in env2_polys]
-    #             cur_match_values.sort(key=lambda x: x[0])
-    #             matches.append(cur_match_values[0])
 
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -1086,6 +1048,8 @@ def draw_bokeh_plots(matches, env1, env2, title_data):
     histogram_plot.add_tools(hover)
 
     filename = '{}_and_{}_interaction_{}.html'.format(env1.name, env2.name, current_time)
+    if not os.path.exists('img'):
+        os.mkdir('img')
     output_file(os.path.join('img', filename))
 
     from bokeh.models import Div
