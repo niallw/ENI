@@ -344,6 +344,18 @@ class Environment():
         # self.visibility_arrangement = None
 
     def build_vis_poly_helper(self, tri_x, tri_y):
+        """Compute the visibility polygon at a given (legal) point in the environment.
+
+        Args:
+            tri_x: Position of the query point in the x-dimension.
+            tri_y: Position of the query point in the y-dimension.
+
+        Returns:
+            The visibility polygon at (tri_x, tri_y).
+
+        Return type:
+            StarPolygon object
+        """
         p = [tri_x, tri_y]
         if not self.point_is_legal(p):
             return None
@@ -355,6 +367,17 @@ class Environment():
             return star_polygon.StarPolygon(vis, np.array([tri_x, tri_y]))
             
     def get_point_inside(self, verts):
+        """Compute a random point inside a polygon.
+
+        Args:
+            verts: The vertices of the polygon we wish to sample.
+
+        Returns:
+            A random point inside the given polygon.
+
+        Return type:
+            A list of floats [x, y]
+        """
         segs = [(i, (i+1) % len(verts)) for i in range(len(verts))]
         A = dict(vertices=verts, segments=segs)
         B = tr.triangulate(A, 'p')
@@ -368,6 +391,20 @@ class Environment():
         return [(p1[0] + p2[0] + p3[0]) / 3, (p1[1] + p2[1] + p3[1]) / 3]
 
     def point_is_legal(self, p):
+        """Determine if a given point is inside the free space of the environment. For this to be true,
+        the point must be inside the border of the environment and outside of all obstacles in the 
+        environment. The point cannot be on the boundary of either the environment or any obstacles 
+        inside the environment.
+
+        Args:
+            p: The point whose legality we wish to verify.
+
+        Returns:
+            True if the query point is inside the free space of the environment, false otherwise.
+
+        Return type:
+            boolean
+        """
         # Point is not inside the border of the environment
         if self.border.point_inside(p) != 1:
             return False
@@ -380,11 +417,31 @@ class Environment():
         return True
 
     def get_triangulation_vis_poly(self, kernel):
+        """Find the pre-computed visibility polygon that is associated with the given kernel.
+        In practice, we just find the visibility polygon whose kernel is the shortest distance from
+        the given kernel. This means the user must pass in a point that we know to be a kernel of one
+        of the pre-computed visibility polygons. If they do not do this, the returned vis. polygon
+        most likely will not be the correct polygon for the given kernel point.
+
+        Args:
+            kernel: The point in the environment for which we wish to find the visibilty polygon.
+
+        Returns:
+            The visibilty polygon that was computed at the kernel point.
+
+        Return type:
+            StarPolygon object
+        """
         listcopy = list.copy(self.triangulation_visibility_polygons)
         listcopy.sort(key=lambda x: np.linalg.norm(x.kernel - kernel))
         return listcopy[0]
     
     def draw(self, paths=[]):
+        """Create a diagram of the environment and, optionally, paths through that environment.
+
+        Args:
+            paths: A list of paths in the environment that we wish to visualize.
+        """
         fig, ax = plt.subplots(1)
 
         # Environment borders
@@ -408,9 +465,10 @@ class Environment():
         ax.set_aspect('equal')
         plt.title(self.name)
         plt.show()
-        return plt
 
     def draw_triangulation(self):
+        """Create a diagram of the environment, including the triangulation of its free space.
+        """
         fig = plt.figure(constrained_layout=True)
         gs = GridSpec(1, 2, figure=fig)
         ax1 = fig.add_subplot(gs[0, 0])
@@ -455,8 +513,20 @@ class Environment():
         # fig.savefig(save_path, dpi=10000)
 
 def compare_envs(env1, env2, with_rotations=True, title_data=''):
-    """For each evenly spaced position (i.e. triangulation vertex) in env1, find the best matching position in env2 (from random samples of the environment).
-    In practice, env1 is the virtual environment and env2 is the physical environment.
+    """Compute the ENI metric for two given environments. This implements the main optimization algorithm 
+    described in Section 3 of the paper.
+
+    For each evenly spaced position (i.e. triangulation vertex) in env1, find the best matching position 
+    in env2 (from random samples of the environment). In practice, env1 is the virtual environment and env2 
+    is the physical environment.
+
+    Args:
+        env1: The virtual environment.
+        env2: The physical environment.
+        with_rotations: Whether or not to consider rotations of the visibility polygons when computing the
+                        most compatible physical and virtual configurations.
+        title_data: Optional additional information to include in the title of the generated plots. This is
+                    useful for keeping track of what a particular ENI score was computed from.
     """
     import time
     start_time = time.time()
@@ -510,6 +580,15 @@ def compare_envs(env1, env2, with_rotations=True, title_data=''):
     draw_bokeh_plots(matches, env1, env2, title_data)
 
 def draw_bokeh_plots(matches, env1, env2, title_data):
+    """Draw plots to visualize the ENI score of two environments. This method uses the bokeh library
+    to create this visualization. This method is very ugly and you probably don't care about it.
+
+    Args:
+        env1: The virtual environment.
+        env2: The physical environment.
+        title_data: Optional additional information to include in the title of the generated plots. This is
+                    useful for keeping track of what a particular ENI score was computed from.
+    """
     from bokeh.io import curdoc, show
     from bokeh.layouts import row
     from bokeh.models import CustomJS, ColumnDataSource, LinearColorMapper, Grid, LinearAxis, MultiPolygons, Plot, ColorBar, LogColorMapper
