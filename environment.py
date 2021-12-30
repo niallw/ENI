@@ -26,7 +26,9 @@ class Environment():
     """An environment class.
 
     This class stores data related to a physical or virtual environment, which is defined in an
-    XML file. This class is useful for sampling points and paths in the environment.
+    XML file. In practice, the environment is defined as a closed polygon with holes. The boundary of 
+    this polygon represents the walls enclosing the environment, and holes in the polygon represent
+    obstacles in the environment.
 
     Attributes:
         SAMPLES_PER_SQ_METER: The number of points sampled per square meter in the environment.
@@ -320,6 +322,9 @@ class Environment():
         return verts, segments, holes
 
     def build_visibility_polygons(self):
+        """Compute visibility polygons at all of the sampled locations in the environment
+        free space.
+        """
         # One-time precomputation to aid in visibility queries
         self.tri_expansion = TriangularExpansionVisibility(self.visibility_arrangement) 
         tri_x = [v[0] for v in self.triangulated_env['vertices']]
@@ -330,16 +335,6 @@ class Environment():
             if vis_poly:
                 self.triangulation_visibility_polygons.append(vis_poly)
 
-        # # Build vis polygons that are centered at points randomly sampled across the environment.
-        # # These polygons are NOT centered on the vertices of the triangulation.
-        # print('Building visibility polygons for randomly sampled points.')
-        # self.num_samples = int(self.SAMPLES_PER_SQ_METER * self.area) + 1
-        # for i in tqdm(range(self.num_samples)):
-        #     pt = self.sample_environment()
-        #     vis_poly = self.build_vis_poly_helper(pt[0], pt[1])
-        #     if vis_poly:
-        #         self.sampled_points.append(pt)
-        #         self.random_sampled_visibility_polygons.append(vis_poly)
         self.random_sampled_visibility_polygons = []
 
         print('num DT vis polys:', len(self.triangulation_visibility_polygons))
@@ -372,28 +367,6 @@ class Environment():
 
         return [(p1[0] + p2[0] + p3[0]) / 3, (p1[1] + p2[1] + p3[1]) / 3]
 
-    def sample_environment(self):
-        triangle_index = random.choice(self.triangle_distribution)
-        tri = self.triangulated_env['triangles'][triangle_index]
-        p1 = self.triangulated_env['vertices'][tri[0]]
-        p2 = self.triangulated_env['vertices'][tri[1]]
-        p3 = self.triangulated_env['vertices'][tri[2]]
-        sampled_point = self.sample_triangle(p1, p2, p3)
-        while not self.point_is_legal(sampled_point):
-            sampled_point = self.sample_triangle(p1, p2, p3)
-        assert self.point_is_legal(sampled_point), 'Sampled point is not valid!'
-        return sampled_point
-
-    def sample_triangle(self, p1, p2, p3):
-        p1 = np.array(p1)
-        p2 = np.array(p2)
-        p3 = np.array(p3)
-        r1 = random.uniform(0, 1)
-        r2 = random.uniform(0, 1)
-
-        sampled_pt = ((1 - math.sqrt(r1)) * p1) + (math.sqrt(r1) * (1 - r2) * p2) + (math.sqrt(r1) * r2 * p3)
-        return [sampled_pt[0], sampled_pt[1]]
-
     def point_is_legal(self, p):
         # Point is not inside the border of the environment
         if self.border.point_inside(p) != 1:
@@ -406,46 +379,10 @@ class Environment():
 
         return True
 
-    def get_distance_in_direction(self, pos, direction):
-        closest_dist = float('inf')
-        for i in range(len(self.border.pts)):
-            p1 = self.border.pts[i]
-            p2 = self.border.pts[(i+1) % len(self.border.pts)]
-            its = geometry.ray_line_intersect(pos, direction, p1, p2)
-            if its >= 0 and its < closest_dist:
-                closest_dist = its
-
-        for obs in self.obstacles:
-            for i in range(len(obs.pts)):
-                p1 = obs.pts[i]
-                p2 = obs.pts[(i+1) % len(obs.pts)]
-                its = geometry.ray_line_intersect(pos, direction, p1, p2)
-                if its >= 0 and its < closest_dist:
-                    closest_dist = its
-
-        assert closest_dist != float('inf'), 'Could not find a closest object from position ({}, {}) in direction {} for environment {}!'.format(pos[0], pos[1], direction, self.name)
-        return closest_dist
-
-    def optimal_comparison_helper(self, virt_poly, phys_poly_list):
-        best_val = float('inf')
-        for phys_poly in phys_poly_list:
-            best_virt_poly = self.find_best_match(phys_poly)
-            cur_val = best_virt_poly.compare_non_overlap(phys_poly)
-            if cur_val < best_val:
-                best_val = cur_val
-        return best_val
-
     def get_triangulation_vis_poly(self, kernel):
         listcopy = list.copy(self.triangulation_visibility_polygons)
         listcopy.sort(key=lambda x: np.linalg.norm(x.kernel - kernel))
         return listcopy[0]
-        ttt = 3
-        # TODO: FIXME: use a hashmap?
-        for poly in self.triangulation_visibility_polygons:
-            # if np.allclose(poly.kernel, kernel):
-            if np.linalg.norm(poly.kernel - kernel) <= 0.01:
-                return poly
-        print('Failed to find a visibility polygon for the point: {}'.format(kernel))
 
     def compare_optimal(self, other_env, extra_title=''):
         self.similarities = []
@@ -616,24 +553,6 @@ class Environment():
             f.write('min value: {} | max value: {} | std. dev.: {} | mean: {} | median: {}\n'.format(min(self.similarities), max(self.similarities), np.std(self.similarities), statistics.mean(self.similarities), statistics.median(self.similarities)))
             for item in self.similarities:
                 f.write("%s, " % item)
-
-    def find_best_match(self, self_poly):
-        best_match = None
-        best_val = float('inf')
-        for i in range(len(self.random_sampled_visibility_polygons)):
-            # print('Comparing against virtual polygon #{}/{}'.format(i, len(self.triangulation_visibility_polygons)))
-            # virt_pt = self.sample_environment()
-            # virt_poly = self.triangulation_visibility_polygons[i]
-            # virt_poly = self.build_vis_poly_helper(virt_pt[0], virt_pt[1])
-            virt_poly = self.random_sampled_visibility_polygons[i]
-            # diff = virt_poly.compare_best_virt_non_overlap(self_poly) # rotations
-            diff = virt_poly.compare_non_overlap(self_poly) # no rotations
-
-            if diff < best_val:
-                best_val = diff
-                best_match = virt_poly
-            
-        return best_val
 
     def compare(self, other_env, extra_title=''):
         print('Comparing environments {} and {}...'.format(self.name, other_env.name))
