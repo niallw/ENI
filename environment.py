@@ -29,6 +29,7 @@ class Environment():
     XML file. This class is useful for sampling points and paths in the environment.
 
     Attributes:
+        SAMPLES_PER_SQ_METER: The number of points sampled per square meter in the environment.
         name: The name of the environment.
         border: The polygon that defines the boundary of the environment.
         center: The center of the environment. This is not always the centroid.
@@ -63,6 +64,11 @@ class Environment():
     """
 
     def __init__(self, env_file, triangle_area=None):
+        # self.SAMPLES_PER_SQ_METER = 40
+        self.SAMPLES_PER_SQ_METER = .05
+        # import random
+        # random.seed(random.randint(0, 91238748))
+
         self.file = env_file
         self.name = None
         self.border = None # Polygon object
@@ -90,6 +96,7 @@ class Environment():
         self.compute_area()
         self.compute_extents()
         if triangle_area == None:
+            # TODO: confirm which triangle area/sampling scheme i'm using
             # self.triangulate(area=0.01)
             # self.triangulate(area=.5)
             # self.triangulate(area=1)
@@ -100,11 +107,15 @@ class Environment():
         self.build_visibility_polygons()
 
     def compute_area(self):
+        """Compute the area of the free space of the environment.
+        """
         obs_areas = [o.area for o in self.obstacles]
         obs_area = sum(obs_areas)
         self.area = self.border.area - obs_area
 
     def compute_extents(self):
+        """Compute the bounding box of the environment.
+        """
         min_x = min(p[0] for p in self.border.pts)
         max_x = max(p[0] for p in self.border.pts)
         min_y = min(p[1] for p in self.border.pts)
@@ -128,6 +139,11 @@ class Environment():
         self.centroid = np.array([sum_x, sum_y])
 
     def parse_env_file(self, env_file):
+        """Parse an environment description file to create an environment object.
+        
+        Args:
+            env_file: The filename of the environment description file to be parsed.
+        """
         tree = ET.parse(env_file)
         root = tree.getroot()
         self.name = root.attrib['name']
@@ -158,6 +174,11 @@ class Environment():
         print('--- Finished environment parsing ---')
 
     def parse_border(self, elem):
+        """Parse out the border (bounding polygon) of the environment from the environment file.
+
+        Args:
+            elem: XML element containing the vertices data for the environment boundary.
+        """
         print('Parsing {}...'.format(elem.attrib['name']))
         center = None
         verts = []
@@ -184,6 +205,11 @@ class Environment():
         self.center = center
 
     def parse_obs(self, elem):
+        """Parse out an obstacle (polygon) of the environment from the environment file.
+
+        Args:
+            elem: XML element containing the vertices data for the obstacle.
+        """
         print('Parsing {}...'.format(elem.attrib['name']))
         verts = []
 
@@ -195,6 +221,12 @@ class Environment():
         self.obstacles.append(star_polygon.StarPolygon(verts, compute_area=True))
 
     def triangulate(self, area=0.1):
+        """Compute the constrained conforming Delaunay triangulation of the free space of the 
+        environment.
+
+        Args:
+            area: Maximum area constraint on the size of triangles in the triangulation.
+        """
         print('--- Triangulating environment ---')
         print('CDT area:', area)
         # Extract the segment data from the environment border and obstacles
@@ -231,9 +263,36 @@ class Environment():
         print('--- Finished triangulation ---')
 
     def triangle_area(self, p1, p2, p3):
+        """Compute the area of a triangle.
+        
+        Args:
+            p1: The first vertex of the triangle.
+            p2: The second vertex of the triangle.
+            p3: The third vertex of the triangle.
+
+        Returns:
+            The area of the triangle defined by (p1, p2, p3).
+
+        Return type:
+            float
+        """
         return abs(((p1[0]*(p2[1] - p3[1])) + (p2[0]*(p3[1] - p1[1])) + (p3[0]*(p1[1] - p2[1]))) * 0.5)
 
     def get_triangulation_data(self, walls, obs):
+        """Extract some useful information from the triangulation structure, including the triangulation
+        vertices and segments, and the locations of holes in the environment polygon (where holes represent
+        obstacles).
+
+        Args:
+            walls: The walls of the outer border of the environment (the edges of the environment boundary).
+            obs: A list of obstacles in the environment.
+
+        Returns:
+            A tuple of the vertices, segments and holes in the triangulation of the environment.
+
+        Return type:
+            A tuple of three lists ([], [], [])
+        """
         verts = []
         segments = []
         holes = []
@@ -805,8 +864,7 @@ class Environment():
         # fig.savefig(save_path, dpi=10000)
 
 def compare_envs(env1, env2, with_rotations=True, title_data=''):
-    """For each evenly spaced position (i.e. triangulation vertex) in env1, find the 
-    best matching position in env2 (from random samples of the environment).
+    """For each evenly spaced position (i.e. triangulation vertex) in env1, find the best matching position in env2 (from random samples of the environment).
     In practice, env1 is the virtual environment and env2 is the physical environment.
     """
     import time
@@ -819,6 +877,8 @@ def compare_envs(env1, env2, with_rotations=True, title_data=''):
 
     env1_positions_x = [v[0] for v in env1.triangulated_env['vertices']]
     env1_positions_y = [v[1] for v in env1.triangulated_env['vertices']]
+    env1_polys = env1.random_sampled_visibility_polygons
+    env2_polys = env2.random_sampled_visibility_polygons
     env2_polys = env2.triangulation_visibility_polygons
 
     env2_polys_rotated = []
@@ -848,6 +908,37 @@ def compare_envs(env1, env2, with_rotations=True, title_data=''):
                 temp_matches = [(env1_vis_poly.minus(env2_vis_poly), env1_vis_poly.kernel, env2_vis_poly.kernel) for env2_vis_poly in env2_polys]
                 temp_matches.sort(key=lambda x: x[0])
                 matches.append(temp_matches[0])
+
+    # # The commented tqdm loop below are is bug. In this loop, I am rotating the virtual visibility polygon and computing virt_vis_poly - phys_vis_poly. I should be rotating the physical visibility polygon because that's the one we actually have control over via RDW.
+    # for i in tqdm(range(len(env1_positions_x))):
+    #     p = [env1_positions_x[i], env1_positions_y[i]]
+    #     if not env1.point_is_legal(p):
+    #         pass
+    #         # matches.append((0, p, p))
+    #     else:
+    #         env1_vis_poly = env1.get_triangulation_vis_poly(np.array(p))
+    #         if with_rotations:
+    #             num_rotations = 10
+    #             rotation_amount = geometry.TWO_PI / num_rotations
+    #             best_match_diff = float('inf')
+    #             best_match = None
+    #             for i in range(num_rotations):
+    #                 num_rotations = 10
+    #                 rotation_amount = geometry.TWO_PI / num_rotations
+    #                 best_match_diff = float('inf')
+    #                 best_match = None
+    #                 for i in range(num_rotations):
+    #                     rotated_env1_vis_poly = env1_vis_poly.rotate(i * rotation_amount)
+    #                     cur_match_values = [(rotated_env1_vis_poly.minus(env2_vis_poly), rotated_env1_vis_poly.kernel, env2_vis_poly.kernel) for env2_vis_poly in env2_polys]
+    #                     cur_match_values.sort(key=lambda x: x[0])
+    #                     if cur_match_values[0][0] < best_match_diff:
+    #                         best_match_diff = cur_match_values[0][0]
+    #                         best_match = cur_match_values[0]
+    #             matches.append(best_match)
+    #         else:
+    #             cur_match_values = [(env1_vis_poly.minus(env2_vis_poly), env1_vis_poly.kernel, env2_vis_poly.kernel) for env2_vis_poly in env2_polys]
+    #             cur_match_values.sort(key=lambda x: x[0])
+    #             matches.append(cur_match_values[0])
 
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -1048,8 +1139,6 @@ def draw_bokeh_plots(matches, env1, env2, title_data):
     histogram_plot.add_tools(hover)
 
     filename = '{}_and_{}_interaction_{}.html'.format(env1.name, env2.name, current_time)
-    if not os.path.exists('img'):
-        os.mkdir('img')
     output_file(os.path.join('img', filename))
 
     from bokeh.models import Div
