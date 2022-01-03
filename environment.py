@@ -247,10 +247,8 @@ class Environment():
         else:
             A = dict(vertices=self.triangulation_verts, segments=self.triangulation_segs, holes=self.triangulation_holes)
         # self.triangulated_env = tr.triangulate(A, 'pa0.1q')
-        print('crash1')
         self.triangulated_env = tr.triangulate(A, 'pa{}'.format(area))
         # self.triangulated_env = tr.triangulate(A, 'p')
-        print('crash2')
 
         # Compute the areas of the triangles. This is used to unformly sample the triangulation.
         for tri in self.triangulated_env['triangles']:
