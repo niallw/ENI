@@ -16,6 +16,7 @@ conda activate eni
 ```
 
 5) Run the script using the following command:
-```python3 environment.py```
+```python3 environment.py
+```
 
 The results can be found in the `img` folder.
