@@ -31,7 +31,6 @@ class Environment():
     obstacles in the environment.
 
     Attributes:
-        SAMPLES_PER_SQ_METER: The number of points sampled per square meter in the environment.
         name: The name of the environment.
         border: The polygon that defines the boundary of the environment.
         center: The center of the environment. This is not always the centroid.
@@ -66,11 +65,6 @@ class Environment():
     """
 
     def __init__(self, env_file, triangle_area=None):
-        # self.SAMPLES_PER_SQ_METER = 40
-        self.SAMPLES_PER_SQ_METER = .05
-        # import random
-        # random.seed(random.randint(0, 91238748))
-
         self.file = env_file
         self.name = None
         self.border = None # Polygon object
@@ -98,11 +92,6 @@ class Environment():
         self.compute_area()
         self.compute_extents()
         if triangle_area == None:
-            # TODO: confirm which triangle area/sampling scheme i'm using
-            # self.triangulate(area=0.01)
-            # self.triangulate(area=.5)
-            # self.triangulate(area=1)
-            # self.triangulate(area=(200 / self.area))
             self.triangulate(area=(self.area / 500))
         else:
             self.triangulate(area=triangle_area)
@@ -246,9 +235,7 @@ class Environment():
             A = dict(vertices=self.triangulation_verts, segments=self.triangulation_segs)
         else:
             A = dict(vertices=self.triangulation_verts, segments=self.triangulation_segs, holes=self.triangulation_holes)
-        # self.triangulated_env = tr.triangulate(A, 'pa0.1q')
         self.triangulated_env = tr.triangulate(A, 'pa{}'.format(area))
-        # self.triangulated_env = tr.triangulate(A, 'p')
 
         # Compute the areas of the triangles. This is used to unformly sample the triangulation.
         for tri in self.triangulated_env['triangles']:
@@ -337,9 +324,6 @@ class Environment():
 
         print('num DT vis polys:', len(self.triangulation_visibility_polygons))
         print('num random sample vis polys:', len(self.random_sampled_visibility_polygons))
-        # # Delete this because it prevents us from being able to do multithreading
-        # self.tri_expansion = None
-        # self.visibility_arrangement = None
 
     def build_vis_poly_helper(self, tri_x, tri_y):
         """Compute the visibility polygon at a given (legal) point in the environment.
@@ -504,11 +488,8 @@ class Environment():
         ax2.scatter(verts_x, verts_y, c='green', s=8)
         ax2.set_axis_off()
         ax2.set_aspect('equal')
-        # ax2.set_title('Environment Sampled Points', fontsize=20, fontname='Times New Roman')
-        # plt.title(self.name + ' triangulation')
         plt.show()
         save_path = os.path.join(pathlib.Path(__file__).parent.absolute(), 'paper materials', 'triangulation.pdf')
-        # fig.savefig(save_path, dpi=10000)
 
 def compare_envs(env1, env2, with_rotations=True, title_data=''):
     """Compute the ENI metric for two given environments. This implements the main optimization algorithm 
@@ -658,9 +639,9 @@ def draw_bokeh_plots(matches, env1, env2, title_data):
     correspondence_env2_plot.x_range = Range1d(-max_extent, max_extent)
     correspondence_env2_plot.y_range = Range1d(-max_extent, max_extent)
     correspondence_env2_plot.circle("x", "y", source=s3, radius=0.1, color="firebrick")
-    # fancy javascript to link subplots
+    # Fancy javascript to link subplots
     # js pushes selected points into ColumnDataSource of 2nd plot
-    # inspiration for this from a few sources:
+    # Inspiration for this from a few sources:
     # credit: https://stackoverflow.com/users/1097752/iolsmit via: https://stackoverflow.com/questions/48982260/bokeh-lasso-select-to-table-update
     # credit: https://stackoverflow.com/users/8412027/joris via: https://stackoverflow.com/questions/34164587/get-selected-data-contained-within-box-select-tool-in-bokeh
     s1.selected.js_on_change(
@@ -761,7 +742,6 @@ def draw_bokeh_plots(matches, env1, env2, title_data):
 
     from bokeh.models import Div
     div = Div(text=title_data, width=200, height=100)
-    # save(row(correspondence_env1_plot, correspondence_env2_plot, histogram_plot), row(div))
     save(gridplot([correspondence_env1_plot, correspondence_env2_plot, histogram_plot, div], ncols=3))
 
     print('Finished bokeh plot generation!')
