@@ -15,6 +15,7 @@ conda env create -f environment.yml
 conda activate eni
 ```
 
-5) Run ```python3 environment.py```.
+5) Run the script using the following command:
+```python3 environment.py```
 
 The results can be found in the `img` folder.
