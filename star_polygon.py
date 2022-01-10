@@ -24,10 +24,6 @@ class StarPolygon:
         verts: A list of Vertex objects denoting the vertices of the polygon.
         edges: A list of Edge objects denoting the edges of the polygon.
         area: The area of the polygon.
-        perimeter: The perimeter of the polygon.
-        min_diameter: The shortest line that connects two edges of the polygon and passes
-                      through the kernel.
-        avg_radius: The average value of the distance from the kernel to the polygon boundary.
     """
 
     def __init__(self, pts, center=None, compute_area=False):
