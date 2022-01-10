@@ -31,9 +31,12 @@ class Environment():
     obstacles in the environment.
 
     Attributes:
+        file: The name of the file that defines the environment layout.
         name: The name of the environment.
         border: The polygon that defines the boundary of the environment.
         center: The center of the environment. This is not always the centroid.
+        width: The maximum width of the environment.
+        height: The maximum height of the environment.
         area: The area of the walkable space in the environment.
         obstacles: A list of obstacles present in the environment. Does not include the boundary.
         triangulation_verts: The vertices defining the triangulation of the walkable space in 
@@ -46,22 +49,13 @@ class Environment():
                               2D points (that lie inside the obstacle).
         triangle_areas: The areas of the triangles in the triangulation of the environment. This is
                          used when uniformly sampling points in the environment.
-        normalized_tringle_areas: The normalized areas of the triangles in the triangulation of the
-                                   environment. This is used when uniformly sampling points in the
-                                   environment.
-        triangle_distribution: A histogram of the triangles in the triangulation of the environment. 
-                                This list is the indices of triangles (freq. of index scaled by 
-                                triangle's relative area). This is used when uniformly sampling points 
-                                in the environment.
         triangulated_env: The triangulated environment (from the triangle library).
-        visibility_segments: A representation of the environment boundary and obstacles as a list of
-                              2D line segments. This is used for visibility computations.
-        num_samples: The number of samples taken in the environment.
-        sampled_points: A list of the points that were sampled from the environment.
-        sampled_visibility_polygons: A list of the visibility polygons computed at each of the sampled
-                                      points.
-        sampled_min_diameters: A list of the minimum diameters of the visibility polygons that were
-                                computed at the sampled points.
+        triangulation_visibility_polygons: The visibility polygons whose kernels are the points of the
+                                           triangluation of the environment free space.
+        random_sampled_visibility_polygons: The visibility polygons whose kernels are the points that are
+                                            randomly sampled from the environment free space.
+        visibility_arrangement: Auxilliary structure required for visibility computation.
+        tri_expansion: Auxilliary structure required for visibility computation.
     """
 
     def __init__(self, env_file, triangle_area=None):
@@ -77,14 +71,9 @@ class Environment():
         self.triangulation_segs = None
         self.triangulation_holes = None
         self.triangle_areas = []
-        self.normalized_tringle_areas = []
-        self.triangle_distribution = []
         self.triangulated_env = None
-        self.num_samples = None
-        self.sampled_points = []
         self.triangulation_visibility_polygons = []
         self.random_sampled_visibility_polygons = []
-        self.sampled_min_diameters = []
         self.visibility_arrangement = arrangement.Arrangement()
         self.tri_expansion = None
 
@@ -244,9 +233,6 @@ class Environment():
             p3 = self.triangulated_env['vertices'][tri[2]]
             self.triangle_areas.append(self.triangle_area(p1, p2, p3))
         self.area = sum(self.triangle_areas)
-        self.normalized_tringle_areas = [int(round(x / min(self.triangle_areas))) for x in self.triangle_areas]
-        for i in range(len(self.normalized_tringle_areas)):
-            self.triangle_distribution.extend([i] * self.normalized_tringle_areas[i])
         print('--- Finished triangulation ---')
 
     def triangle_area(self, p1, p2, p3):
