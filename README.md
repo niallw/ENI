@@ -1,5 +1,5 @@
 # ENI
-Official implementation of the VR2022 paper "ENI: Quantifying Environment Compatibility for Natural Walking in Virtual Reality"
+Official implementation of the IEEE VR 2022 paper "[ENI: Quantifying Environment Compatibility for Natural Walking in Virtual Reality](https://gamma.umd.edu/eni/)" by [Niall L. Wiliams](https://niallw.github.io/), [Aniket Bera](https://www.cs.umd.edu/~ab/), and [Dinesh Manocha](https://www.cs.umd.edu/people/dmanocha).
 
 ## Usage instructions
 
