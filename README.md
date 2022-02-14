@@ -21,3 +21,14 @@ python3 environment.py
 ```
 
 The results can be found in the `img` folder.
+
+## Bibtex
+```
+@inproceedings{williams2022eni,
+title={{E}{N}{I}: {Q}uantifying {E}nvironment {C}ompatibility for {N}atural {W}alking in {V}irtual {R}eality},
+author={Williams, Niall L and Bera, Aniket and Manocha, Dinesh},
+booktitle={2022 IEEE Virtual Reality and 3D User Interfaces (VR)},
+year={2022},
+organization={IEEE}
+}
+```
